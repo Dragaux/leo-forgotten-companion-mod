@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "leo_forgotten_companion",
+  "version": "${version}",
+  "name": "Leo: The Forgotten Companion",
+  "description": "A living horror event mod that runs quietly inside any survival world.",
+  "authors": ["Jayvera Studios"],
+  "contact": {},
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["net.jayvera.leo.LeoMod"],
+    "client": ["net.jayvera.leo.LeoModClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.1",
+    "fabric-api": "*"
+  }
+}

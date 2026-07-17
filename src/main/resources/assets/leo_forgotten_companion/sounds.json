@@ -1,0 +1,14 @@
+{
+  "leo.distant_bark": {
+    "subtitle": "subtitles.entity.leo.distant_bark",
+    "sounds": ["leo_forgotten_companion:leo/distant_bark"]
+  },
+  "leo.lost_dog_howl": {
+    "subtitle": "subtitles.entity.leo.lost_dog_howl",
+    "sounds": ["leo_forgotten_companion:leo/lost_dog_howl"]
+  },
+  "ambient.corruption_drone": {
+    "subtitle": "subtitles.ambient.corruption_drone",
+    "sounds": ["leo_forgotten_companion:ambient/corruption_drone"]
+  }
+}
