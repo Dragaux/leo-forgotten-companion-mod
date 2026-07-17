@@ -52,7 +52,8 @@ public class FinalEvent {
         state.finalChoice = 1;
         state.finalEventActive = false;
         state.markDirty();
-        broadcast(world, "The howling stops. Leo feels stronger.", Formatting.GRAY);
+        String note = state.corruptionEventCount >= 15 ? " Leo endured more than most companions ever have." : "";
+        broadcast(world, "The howling stops. Leo feels stronger." + note, Formatting.GRAY);
         applyEndgame(world, state);
     }
 
@@ -67,11 +68,17 @@ public class FinalEvent {
             forgotten.setCustomName(Text.literal("The Forgotten").formatted(Formatting.DARK_GRAY));
             forgotten.setCustomNameVisible(true);
             forgotten.setTamed(true);
+            // Owner assigned to whichever player is nearest, so it gets real follow/sit AI too.
+            ServerPlayerEntity nearest = world.getClosestPlayer(dog.getX(), dog.getY(), dog.getZ(), 64, false);
+            if (nearest != null) {
+                forgotten.setOwnerUuid(nearest.getUuid());
+            }
             world.spawnEntity(forgotten);
         }
         dog.discard();
 
-        broadcast(world, "The Lost Dog isn't lost anymore.", Formatting.GRAY);
+        String note = state.corruptionEventCount >= 15 ? " Neither of them will forget what this world tried to do." : "";
+        broadcast(world, "The Lost Dog isn't lost anymore." + note, Formatting.GRAY);
         applyEndgame(world, state);
     }
 
@@ -80,9 +87,12 @@ public class FinalEvent {
         state.endgameApplied = true;
         state.markDirty();
 
-        List<WolfEntity> leos = world.getEntitiesByClass(WolfEntity.class,
-                new net.minecraft.util.math.Box(world.getSpawnPos()).expand(1e6),
-                w -> w.hasCustomName() && "Leo".equals(w.getCustomName().getString()));
+        java.util.Set<WolfEntity> leos = new java.util.HashSet<>();
+        for (ServerPlayerEntity onlinePlayer : world.getPlayers()) {
+            leos.addAll(world.getEntitiesByClass(WolfEntity.class,
+                    onlinePlayer.getBoundingBox().expand(48),
+                    w -> w.hasCustomName() && "Leo".equals(w.getCustomName().getString())));
+        }
         for (WolfEntity leo : leos) {
             leo.setHealth(leo.getMaxHealth());
         }
