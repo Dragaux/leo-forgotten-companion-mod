@@ -5,28 +5,38 @@ import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.Items;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Box;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
-/** Guardian mode, treasure hunts, and night patrol - runs once the ending has resolved. */
+/**
+ * Guardian mode, treasure hunts, and night patrol - runs once the ending has resolved.
+ * Searches a bounded radius per online player rather than the whole loaded world,
+ * so it scales reasonably with more players instead of one giant scan.
+ */
 public class EndgameFeatures {
     private static final Random RANDOM = new Random();
     private static final int TICK_INTERVAL = 100; // 5 seconds
+    private static final double SEARCH_RADIUS = 48.0;
 
     public static void tick(ServerWorld world, LeoState state) {
         if (!state.endgameApplied) return;
         if (world.getTime() % TICK_INTERVAL != 0) return;
 
-        List<WolfEntity> leos = world.getEntitiesByClass(WolfEntity.class,
-                new Box(world.getSpawnPos()).expand(1e6),
-                w -> w.hasCustomName() && "Leo".equals(w.getCustomName().getString()));
+        Set<WolfEntity> leos = new HashSet<>();
+        for (ServerPlayerEntity player : world.getPlayers()) {
+            leos.addAll(world.getEntitiesByClass(WolfEntity.class,
+                    player.getBoundingBox().expand(SEARCH_RADIUS),
+                    w -> w.hasCustomName() && "Leo".equals(w.getCustomName().getString())));
+        }
 
         for (WolfEntity leo : leos) {
             guardianMode(world, leo);
