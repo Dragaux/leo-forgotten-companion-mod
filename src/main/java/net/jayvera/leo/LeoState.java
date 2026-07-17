@@ -18,7 +18,7 @@ public class LeoState extends PersistentState {
     public int day = 0;
 
     public boolean leoFound = false;
-    public final Set<Integer> firedEvents = new HashSet<>(); // one-shot story beats: 4,7,10,15,20
+    public final Set<Integer> firedEvents = new HashSet<>(); // one-shot story beats: 4,7,10,15,17,18,19,20
 
     // Day 7 - the phantom "Leo?" wolf
     public UUID strangerWolfId = null;
@@ -26,6 +26,11 @@ public class LeoState extends PersistentState {
 
     // Day 10 - corruption phase
     public boolean corruptionActive = false;
+    public int corruptionEventCount = 0;
+    public boolean hasLastCorruptionPos = false;
+    public int lastCorruptionX = 0;
+    public int lastCorruptionY = 0;
+    public int lastCorruptionZ = 0;
 
     // Final event
     public boolean finalEventActive = false;
@@ -47,6 +52,15 @@ public class LeoState extends PersistentState {
         markDirty();
     }
 
+    public void recordCorruptionLocation(int x, int y, int z) {
+        lastCorruptionX = x;
+        lastCorruptionY = y;
+        lastCorruptionZ = z;
+        hasLastCorruptionPos = true;
+        corruptionEventCount++;
+        markDirty();
+    }
+
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putLong("tick", tick);
@@ -58,6 +72,11 @@ public class LeoState extends PersistentState {
         nbt.putInt("strangerUnseenTicks", strangerUnseenTicks);
 
         nbt.putBoolean("corruptionActive", corruptionActive);
+        nbt.putInt("corruptionEventCount", corruptionEventCount);
+        nbt.putBoolean("hasLastCorruptionPos", hasLastCorruptionPos);
+        nbt.putInt("lastCorruptionX", lastCorruptionX);
+        nbt.putInt("lastCorruptionY", lastCorruptionY);
+        nbt.putInt("lastCorruptionZ", lastCorruptionZ);
 
         nbt.putBoolean("finalEventActive", finalEventActive);
         if (lostDogId != null) nbt.putUuid("lostDogId", lostDogId);
@@ -78,6 +97,11 @@ public class LeoState extends PersistentState {
         state.strangerUnseenTicks = nbt.getInt("strangerUnseenTicks");
 
         state.corruptionActive = nbt.getBoolean("corruptionActive");
+        state.corruptionEventCount = nbt.getInt("corruptionEventCount");
+        state.hasLastCorruptionPos = nbt.getBoolean("hasLastCorruptionPos");
+        state.lastCorruptionX = nbt.getInt("lastCorruptionX");
+        state.lastCorruptionY = nbt.getInt("lastCorruptionY");
+        state.lastCorruptionZ = nbt.getInt("lastCorruptionZ");
 
         state.finalEventActive = nbt.getBoolean("finalEventActive");
         if (nbt.containsUuid("lostDogId")) state.lostDogId = nbt.getUuid("lostDogId");
