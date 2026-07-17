@@ -1,6 +1,6 @@
 package net.jayvera.leo.entity;
 
-import net.fabricmc.fabric.api.entity.event.v1.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.jayvera.leo.LeoMod;
 import net.minecraft.entity.EntityDimensions;
