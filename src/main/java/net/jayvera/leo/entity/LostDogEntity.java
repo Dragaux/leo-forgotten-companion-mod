@@ -18,6 +18,7 @@ import net.minecraft.world.World;
  * at which point it can be destroyed or helped.
  */
 public class LostDogEntity extends WolfEntity {
+    private int ticksUntilQuickRemoval = -1; // -1 = disabled, only used for the jump-scare glimpse
 
     public LostDogEntity(EntityType<? extends WolfEntity> entityType, World world) {
         super(entityType, world);
@@ -25,6 +26,24 @@ public class LostDogEntity extends WolfEntity {
         this.setCustomNameVisible(true);
         this.setTamed(false);
         this.setAiDisabled(false);
+    }
+
+    /** Used for the brief jump-scare glimpse: this entity discards itself after the given number of ticks. */
+    public void markForQuickRemoval(int ticks) {
+        this.ticksUntilQuickRemoval = ticks;
+        this.setInvulnerable(true);
+        this.setAiDisabled(true);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (ticksUntilQuickRemoval > 0) {
+            ticksUntilQuickRemoval--;
+            if (ticksUntilQuickRemoval == 0) {
+                this.discard();
+            }
+        }
     }
 
     @Override
