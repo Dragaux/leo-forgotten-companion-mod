@@ -23,27 +23,30 @@ import java.util.Random;
  * Day 7     the stranger - phantom "Leo?" wolf, vanishes unobserved
  * Day 10-14 the corruption - signs, chest swaps, animals vanishing
  * Day 15+   the real Leo - warning bark, shadow detection, protection mode
+ * Day 17    buried collar - a quiet lore beat
+ * Day 18-19 escalating dread before the end
  * Day 20    the last howl - Lost Dog, player chooses destroy or help
  * post-end  guardian mode, treasure hunt, night patrol
  */
 public class LeoEvents {
     private static final Random RANDOM = new Random();
-    private static final long TICKS_PER_DAY = 24000L;
 
     public static void onWorldTick(ServerWorld world) {
         if (world.getPlayers().isEmpty()) return;
 
         LeoState state = LeoState.get(world);
-        state.tick++;
 
-        if (state.tick % TICKS_PER_DAY == 0) {
-            state.day++;
+        long minecraftDay = world.getTimeOfDay() / 24000L;
+        if (minecraftDay > state.day) {
+            state.day = (int) minecraftDay;
             state.markDirty();
         }
 
         if (!state.leoFound && state.day >= 3) {
             checkOrSpawnLeo(world, state);
         }
+
+        NightAtmosphere.tick(world, state);
 
         if (state.day == 4 && !state.hasFired(4) && world.isNight()) {
             fireDay4Event(world, state);
@@ -72,6 +75,19 @@ public class LeoEvents {
         }
         if (state.day >= 15 && !state.finalEventActive) {
             LeoAbilities.tick(world, state);
+        }
+
+        if (state.day == 17 && !state.hasFired(17)) {
+            BuriedCollarEvent.trigger(world, state);
+        }
+
+        if (state.day == 18 && !state.hasFired(18)) {
+            broadcast(world, "The nights feel longer now.", Formatting.DARK_GRAY);
+            state.fire(18);
+        }
+        if (state.day == 19 && !state.hasFired(19)) {
+            broadcast(world, "Something is close. Leo won't stop watching the tree line.", Formatting.DARK_RED);
+            state.fire(19);
         }
 
         if (state.day == 20 && !state.hasFired(20)) {
@@ -109,6 +125,7 @@ public class LeoEvents {
         leo.setCustomName(Text.literal("Leo"));
         leo.setCustomNameVisible(true);
         leo.setTamed(true);
+        leo.setOwnerUuid(target.getUuid()); // real owner - activates vanilla follow/sit/teleport-back AI
         world.spawnEntity(leo);
 
         state.leoFound = true;
