@@ -50,8 +50,8 @@ public class EndgameFeatures {
         ItemEntity drop = new ItemEntity(world, leo.getX(), leo.getY() + 0.3, leo.getZ(), loot);
         world.spawnEntity(drop);
 
-        if (leo.getOwner() != null) {
-            leo.getOwner().sendMessage(
+        if (leo.getOwner() instanceof net.minecraft.server.network.ServerPlayerEntity owner) {
+            owner.sendMessage(
                     Text.literal("Leo found something.").formatted(Formatting.GRAY, Formatting.ITALIC),
                     true
             );
