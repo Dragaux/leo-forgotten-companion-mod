@@ -45,7 +45,7 @@ public class LostDogEntity extends WolfEntity {
     }
 
     @Override
-    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
         if (this.getWorld() instanceof net.minecraft.server.world.ServerWorld sw
                 && net.jayvera.leo.LeoState.get(sw).finalEventActive
                 && player.getStackInHand(hand).isOf(Items.BONE)) {
