@@ -33,15 +33,9 @@ public class LeoState extends PersistentState {
     public int finalChoice = 0; // 0 = undecided, 1 = destroyed, 2 = helped
     public boolean endgameApplied = false;
 
-    public static final Type<LeoState> TYPE = new Type<>(
-            LeoState::new,
-            LeoState::fromNbt,
-            null
-    );
-
     public static LeoState get(ServerWorld world) {
         PersistentStateManager manager = world.getPersistentStateManager();
-        return manager.getOrCreate(TYPE, "leo_forgotten_companion");
+        return manager.getOrCreate(LeoState::fromNbt, LeoState::new, "leo_forgotten_companion");
     }
 
     public boolean hasFired(int eventId) {
