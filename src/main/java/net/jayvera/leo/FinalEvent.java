@@ -68,4 +68,41 @@ public class FinalEvent {
             forgotten.setCustomName(Text.literal("The Forgotten").formatted(Formatting.DARK_GRAY));
             forgotten.setCustomNameVisible(true);
             forgotten.setTamed(true);
-            // Owner assigned to whichever player is nearest, so it gets real
+            // Owner assigned to whichever player is nearest, so it gets real follow/sit AI too.
+            net.minecraft.entity.player.PlayerEntity nearest = world.getClosestPlayer(dog.getX(), dog.getY(), dog.getZ(), 64, false);
+            if (nearest != null) {
+                forgotten.setOwnerUuid(nearest.getUuid());
+            }
+            world.spawnEntity(forgotten);
+        }
+        dog.discard();
+
+        String note = state.corruptionEventCount >= 15 ? " Neither of them will forget what this world tried to do." : "";
+        broadcast(world, "The Lost Dog isn't lost anymore." + note, Formatting.GRAY);
+        applyEndgame(world, state);
+    }
+
+    private static void applyEndgame(ServerWorld world, LeoState state) {
+        if (state.endgameApplied) return;
+        state.endgameApplied = true;
+        state.markDirty();
+
+        java.util.Set<WolfEntity> leos = new java.util.HashSet<>();
+        for (ServerPlayerEntity onlinePlayer : world.getPlayers()) {
+            leos.addAll(world.getEntitiesByClass(WolfEntity.class,
+                    onlinePlayer.getBoundingBox().expand(48),
+                    w -> w.hasCustomName() && "Leo".equals(w.getCustomName().getString())));
+        }
+        for (WolfEntity leo : leos) {
+            leo.setHealth(leo.getMaxHealth());
+        }
+
+        broadcast(world, "Leo settles in. Guardian mode active - he'll watch the base at night.", Formatting.GREEN);
+    }
+
+    private static void broadcast(ServerWorld world, String message, Formatting color) {
+        for (ServerPlayerEntity player : world.getPlayers()) {
+            player.sendMessage(Text.literal(message).formatted(color, Formatting.ITALIC), false);
+        }
+    }
+}
