@@ -43,8 +43,11 @@ public class CorruptionEvents {
     private static final int AMBIENT_INTERVAL_TICKS = 1200; // roughly once a minute
 
     public static void tick(ServerWorld world, LeoState state) {
-        if (world.getTime() % AMBIENT_INTERVAL_TICKS == 0 && RANDOM.nextDouble() < 0.4) {
-            playAmbientDrone(world);
+        if (world.getTime() % AMBIENT_INTERVAL_TICKS == 0) {
+            double intensity = Dread.intensity(state);
+            if (RANDOM.nextDouble() < 0.3 + intensity * 0.5) {
+                playAmbientDrone(world, state);
+            }
         }
 
         if (world.getTime() % CHECK_INTERVAL_TICKS != 0) return;
@@ -67,10 +70,12 @@ public class CorruptionEvents {
         }
     }
 
-    private static void playAmbientDrone(ServerWorld world) {
+    private static void playAmbientDrone(ServerWorld world, LeoState state) {
+        double intensity = Dread.intensity(state);
+        float volume = (float) (0.35 + intensity * 0.4);
         for (net.minecraft.server.network.ServerPlayerEntity player : world.getPlayers()) {
             world.playSound(null, player.getBlockPos(), net.jayvera.leo.ModSounds.CORRUPTION_DRONE,
-                    net.minecraft.sound.SoundCategory.AMBIENT, 0.35f, 1.0f);
+                    net.minecraft.sound.SoundCategory.AMBIENT, volume, 1.0f);
         }
     }
 
