@@ -7,6 +7,7 @@
   "authors": ["Jayvera Studios"],
   "contact": {},
   "license": "MIT",
+  "icon": "assets/leo_forgotten_companion/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": ["net.jayvera.leo.LeoMod"],
