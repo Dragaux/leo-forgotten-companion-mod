@@ -46,7 +46,7 @@ public class LeoAbilities {
             warningBark(world, leo);
             shadowDetection(world, leo);
             protectionMode(world, leo);
-            idleUnease(world, leo);
+            idleUnease(world, leo, state);
             memoryGlance(world, leo, state);
         }
     }
@@ -79,11 +79,14 @@ public class LeoAbilities {
         }
     }
 
-    /** Leo occasionally growls at nothing visible - unease, not a real threat detected. */
-    private static void idleUnease(ServerWorld world, WolfEntity leo) {
-        if (RANDOM.nextDouble() < IDLE_GROWL_CHANCE) {
+    /** Leo occasionally growls at nothing visible - unease, not a real threat detected. Escalates toward Day 20. */
+    private static void idleUnease(ServerWorld world, WolfEntity leo, LeoState state) {
+        double intensity = Dread.intensity(state);
+        double chance = IDLE_GROWL_CHANCE + intensity * 0.05;
+        if (RANDOM.nextDouble() < chance) {
+            float volume = (float) (0.5 + intensity * 0.5);
             world.playSound(null, leo.getBlockPos(), SoundEvents.ENTITY_WOLF_GROWL,
-                    SoundCategory.NEUTRAL, 0.5f, 1.3f);
+                    SoundCategory.NEUTRAL, volume, 1.3f);
         }
     }
 
