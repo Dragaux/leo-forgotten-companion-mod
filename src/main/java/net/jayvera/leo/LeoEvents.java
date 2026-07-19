@@ -47,6 +47,7 @@ public class LeoEvents {
         }
 
         NightAtmosphere.tick(world, state);
+        Dread.heartbeatTick(world, state);
 
         if (state.day == 4 && !state.hasFired(4) && world.isNight()) {
             fireDay4Event(world, state);
