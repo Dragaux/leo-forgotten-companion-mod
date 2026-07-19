@@ -18,7 +18,8 @@ import java.util.Random;
 /**
  * Master dispatcher. Runs every world tick and drives the full timeline:
  *
- * Day 1-3   normal - only watching for a wolf named Leo
+ * Day 0     immediate stinger - the very first thing that happens
+ * Day 1-3   normal (mostly) - only watching for a wolf named Leo
  * Day 4     first sign - distant bark, no source
  * Day 7     the stranger - phantom "Leo?" wolf, vanishes unobserved
  * Day 10-14 the corruption - signs, chest swaps, animals vanishing
@@ -26,7 +27,8 @@ import java.util.Random;
  * Day 17    buried collar - a quiet lore beat
  * Day 18-19 escalating dread before the end
  * Day 20    the last howl - Lost Dog, player chooses destroy or help
- * post-end  guardian mode, treasure hunt, night patrol
+ * post-end  guardian mode, treasure hunt, night patrol, and an extended
+ *           epilogue running through Day 30
  */
 public class LeoEvents {
     private static final Random RANDOM = new Random();
@@ -42,12 +44,18 @@ public class LeoEvents {
             state.markDirty();
         }
 
+        if (!state.hasFired(0)) {
+            fireImmediateStinger(world, state);
+        }
+
         if (!state.leoFound && state.day >= 3) {
             checkOrSpawnLeo(world, state);
         }
 
         NightAtmosphere.tick(world, state);
         Dread.heartbeatTick(world, state);
+        LeoBondTracker.tick(world, state);
+        LeoSymptoms.tick(world, state);
 
         if (state.day == 4 && !state.hasFired(4) && world.isNight()) {
             fireDay4Event(world, state);
@@ -98,6 +106,20 @@ public class LeoEvents {
         if (state.endgameApplied) {
             EndgameFeatures.tick(world, state);
         }
+        Epilogue.tick(world, state);
+    }
+
+    private static void fireImmediateStinger(ServerWorld world, LeoState state) {
+        for (ServerPlayerEntity player : world.getPlayers()) {
+            world.playSound(null, player.getBlockPos(), ModSounds.CORRUPTION_DRONE,
+                    SoundCategory.AMBIENT, 0.6f, 0.5f);
+            player.sendMessage(
+                    Text.literal("Somewhere, something is looking for its person.")
+                            .formatted(Formatting.DARK_GRAY, Formatting.ITALIC),
+                    false
+            );
+        }
+        state.fire(0);
     }
 
     private static void checkOrSpawnLeo(ServerWorld world, LeoState state) {
