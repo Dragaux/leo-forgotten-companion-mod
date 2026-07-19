@@ -18,7 +18,8 @@ public class LeoState extends PersistentState {
     public int day = 0;
 
     public boolean leoFound = false;
-    public final Set<Integer> firedEvents = new HashSet<>(); // one-shot story beats: 4,7,10,15,17,18,19,20
+    public int leoBondTicks = 0;
+    public final Set<Integer> firedEvents = new HashSet<>(); // one-shot story beats: 0,4,7,10,15,17,18,19,20,25,30
 
     // Day 7 - the phantom "Leo?" wolf
     public UUID strangerWolfId = null;
@@ -66,6 +67,7 @@ public class LeoState extends PersistentState {
         nbt.putLong("tick", tick);
         nbt.putInt("day", day);
         nbt.putBoolean("leoFound", leoFound);
+        nbt.putInt("leoBondTicks", leoBondTicks);
         nbt.putIntArray("firedEvents", firedEvents.stream().mapToInt(Integer::intValue).toArray());
 
         if (strangerWolfId != null) nbt.putUuid("strangerWolfId", strangerWolfId);
@@ -91,6 +93,7 @@ public class LeoState extends PersistentState {
         state.tick = nbt.getLong("tick");
         state.day = nbt.getInt("day");
         state.leoFound = nbt.getBoolean("leoFound");
+        state.leoBondTicks = nbt.getInt("leoBondTicks");
         for (int id : nbt.getIntArray("firedEvents")) state.firedEvents.add(id);
 
         if (nbt.containsUuid("strangerWolfId")) state.strangerWolfId = nbt.getUuid("strangerWolfId");
